@@ -12,7 +12,7 @@ Since springflow cannot be measured directly due to the complicating runoff fact
 ### dataRetrieval with NWIS data
 
 ```{r}
-#reading and combining all 6 gages into one tibble
+#Steps 4-5, reading and combining all 6 gages into one tibble
 'smr'<-readNWISdv(siteNumbers = "08170500",
                parameterCd = "00060")
 'sms'<-readNWISdv(siteNumbers = "08170000",
@@ -31,24 +31,80 @@ df
 ```
 
 ```{r}
-#fixing column titles and adding new columns
+#Steps 6-8, fixing column titles and adding new columns
 library("tidyverse")
 library("readr")
-gages<-df|>
+gages<-as_tibble(df)|>
   select(site_no:Flow)|>
   mutate(
     Year = year(Date),
     Month = month(Date),
     Day = day(Date))|>
   mutate(
-    'Gage Name' = case_when(site_no=="08170500"~"San Marcos River",
+    gage_name = case_when(site_no=="08170500"~"San Marcos River",
               site_no=="08170000"~"San Marcos Springs",
               site_no=="08169000"~"Comal River",
               site_no=="08168710"~"Comal Springs",
               site_no=="08168932"~"Comal New Channel",
-              site_no=="08168913"~"Comal Old Channel"))|>
-  relocate('Gage Name',.before=Date)|>
-  rename('Gage Number'=site_no,
-         'Discharge(cfs)'=Flow)
-write_csv(gages,"springflow_master.csv")
+              site_no=="08168913"~"Comal Old Channel"
+              ))|>
+  relocate(gage_name,.before=Date)|>
+  rename(gage_number=site_no,
+         cfs=Flow)
+
+#write_csv(gages,"springflow_master.csv")
+```
+
+### Analysis Tibbles
+
+```{r}
+#4 high flow days
+high_flow_days_300<-tibble(
+  filter(gages, cfs>300))
+```
+
+```{r}
+#7 zero flow days by days by gage
+zero_flow_days<-tibble(
+  filter(gages, cfs==0))
+```
+
+```{r}
+#2 median monthly flow per gage
+by_gage_month <- gages|>
+  group_by(gage_name,Month)|>
+  summarise(flow_mean = mean(cfs,na.rm=TRUE))
+by_gage_month
+```
+
+```{r}
+#mean flow by gage and year
+mean_flow_gage_year <- gages |>
+#could add something in here to exclude comal new/old channels
+  group_by(gage_name,Year)|>
+  summarise(mean_flow = mean(cfs,na.rm=TRUE))|>
+  ungroup()
+mean_flow_gage_year
+```
+
+```{r}
+#5, highest median flow by month_day
+
+# group_by (gage, month, day)
+# summarise (median)
+# ungroup()
+# group_by (gage)
+# arrange(desc())
+# slice()
+# ungroup()
+
+peak_monthday_flows <-gages|>
+  group_by(gage_name,Month,Day)|>
+  summarise(median_flow = median(cfs,na.rm=TRUE))|>
+  ungroup()|>
+  group_by(gage_name)|>
+  arrange(desc(median_flow))|>
+  slice(1:1)|>
+  ungroup()
+peak_monthday_flows
 ```
