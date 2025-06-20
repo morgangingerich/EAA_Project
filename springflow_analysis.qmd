@@ -50,6 +50,5 @@ gages<-df|>
   relocate('Gage Name',.before=Date)|>
   rename('Gage Number'=site_no,
          'Discharge(cfs)'=Flow)
-gages
-write_csv(gages,"gages.csv")
+write_csv(gages,"springflow_master.csv")
 ```
