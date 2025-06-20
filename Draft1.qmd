@@ -32,11 +32,24 @@ df
 
 ```{r}
 #fixing column titles and adding new columns
-df|>
+library("tidyverse")
+library("readr")
+gages<-df|>
   select(site_no:Flow)|>
   mutate(
     Year = year(Date),
     Month = month(Date),
-    Day = day(Date)
-  )
+    Day = day(Date))|>
+  mutate(
+    'Gage Name' = case_when(site_no=="08170500"~"San Marcos River",
+              site_no=="08170000"~"San Marcos Springs",
+              site_no=="08169000"~"Comal River",
+              site_no=="08168710"~"Comal Springs",
+              site_no=="08168932"~"Comal New Channel",
+              site_no=="08168913"~"Comal Old Channel"))|>
+  relocate('Gage Name',.before=Date)|>
+  rename('Gage Number'=site_no,
+         'Discharge(cfs)'=Flow)
+gages
+write_csv(gages,"gages.csv")
 ```
