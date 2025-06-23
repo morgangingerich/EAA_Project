@@ -1,0 +1,40 @@
+---
+title: "plotting_exercises"
+format: html
+---
+
+### Monday 6/23 r4ds recreating plots
+
+```{r}
+ggplot(data = penguins,
+       mapping = aes(x= flipper_len, y = body_mass)
+       )+
+  geom_point(aes(color = species, shape = species))+
+  geom_smooth(method = "lm")+
+  labs(
+    title = "Body Mass and Flipper Length",
+    subtitle = "Dimensions for Adelie, Chinstrap, and Gentoo Penguins",
+    x = "Flipper Length (mm)", y = "Body Mass (g)",
+    color = "Species", shape = "Species"
+  )
+```
+
+```{r}
+penguins|>
+  ggplot(aes(x = body_mass))+
+  geom_histogram(binwidth = 200)
+```
+
+```{r}
+penguins|>
+  ggplot(aes(x = species, y = body_mass))+
+  geom_boxplot(
+    aes(color = species,
+        fill = after_scale(clr_desaturate(clr_lighten(color,.6),.6))),
+    linewidth = 1
+  )+
+  scale_color_brewer(palette = "Dark2", guide = "none")+
+  labs(x = "Species", y = "Body Mass (g)")+
+  theme(axis.title.x = element_text(margin = margin(t=10), size = 13),
+        axis.title.y = element_text(margin = margin(r=10), size = 13))
+```
