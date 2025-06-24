@@ -3,7 +3,7 @@ title: "plotting_exercises"
 format: html
 ---
 
-### Monday 6/23 r4ds recreating plots
+### Monday 6/23 Penguin Data Plotting Exercises
 
 ```{r}
 ggplot(data = penguins,
@@ -22,7 +22,11 @@ ggplot(data = penguins,
 ```{r}
 penguins|>
   ggplot(aes(x = body_mass))+
-  geom_histogram(binwidth = 200)
+  geom_histogram(binwidth = 200)+
+  labs(
+    title = "Penguin Size Distribution",
+    subtitle = "Adelie, Chinstrap, and Gentoo penguins",
+    x = "Body Mass (g)", y = "Count")
 ```
 
 ```{r}
@@ -33,8 +37,13 @@ penguins|>
         fill = after_scale(clr_desaturate(clr_lighten(color,.6),.6))),
     linewidth = 1
   )+
+  labs(
+    title = "Body Mass by Species",
+    subtitle = "Statistics for Adelie, Chinstrap, and Gentoo Penguins",
+    x = "Species", y = "Body Mass (g)"
+  )+
   scale_color_brewer(palette = "Dark2", guide = "none")+
-  labs(x = "Species", y = "Body Mass (g)")+
+  theme_set(theme_bw())+
   theme(axis.title.x = element_text(margin = margin(t=10), size = 13),
         axis.title.y = element_text(margin = margin(r=10), size = 13))
 ```

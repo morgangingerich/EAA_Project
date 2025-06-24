@@ -1,0 +1,18 @@
+---
+title: "mapping_exercises"
+format: html
+---
+
+### Monday 6/23 afternoon, beginning mapping practice
+
+```{r}
+library("rnaturalearth")
+library("rnaturalearthdata")
+world<- ne_countries(scale = "medium",returnclass = "sf")
+ggplot(data = world)+
+  geom_sf(aes(fill = pop_est))+
+  labs(fill = "Population (est)")+
+  scale_fill_viridis_c(trans = "sqrt")+
+  xlab("Longitude")+ylab("Latitude")+
+  ggtitle("World Map")
+```

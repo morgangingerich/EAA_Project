@@ -1,0 +1,63 @@
+---
+title: "Sucralose_Dataset"
+format: html
+---
+
+```{r}
+library("tidyverse")
+library("ggplot2")
+library("dataRetrieval")
+library("readr")
+library("cowplot")
+library("googleway")
+library("ggrepel")
+library("ggspatial")
+library("sf")
+library("rnaturalearth")
+library("rnaturalearthdata")
+library("prismatic")
+```
+
+```{r}
+#library("tidyverse")
+#library("readr")
+#library("dataRetrieval")
+(sucralose <- readr::read_csv("sucralose_simplified.csv", col_types = cols(
+  Date = col_date("%m.%d.%Y"),
+)))
+```
+
+```{r}
+theme_set(theme_bw())
+sucralose|>
+  mutate(add_column(sucralose,
+    gage_name = case_when(
+      str_detect(sys_sample_code, "CM") ~ "comal_spring_run_3",
+      str_detect(sys_sample_code, "SM") ~ "san_marcos_hotel")))|>
+  relocate("gage_name",.before="date")|>
+  group_by(gage_name,month)|>
+  summarize(sucralose_mean = mean(result_value, na.rm=TRUE))|>
+  ungroup()|>
+  ggplot(aes(month, sucralose_mean, color=gage_name))+
+  geom_point()+
+  scale_x_continuous(breaks=c(1,2,3,4,5,6,7,8,9,10,11,12))+
+  labs(
+    title = "Sucralose by gage and month",
+    subtitle = "Comal and San Marcos Rivers",
+    x = "Month", y = "Average Sucralose (ng/L)")+
+  theme(axis.title.x = element_text(margin = margin(t=5)),
+        axis.title.y = element_text(margin = margin(r=10)))+
+  scale_color_discrete(
+    name = "Gage",
+    labels = c("Comal River Spring Run 3", "San Marcos Springs Hotel Site"))
+```
+
+```{r}
+plot<- sucralose|>
+  mutate(add_column(sucralose,
+    gage_name = case_when(
+      str_detect(sys_sample_code, "CM") ~ "comal_spring_run_3",
+      str_detect(sys_sample_code, "SM") ~ "san_marcos_hotel")))|>
+  relocate("gage_name",.before="Date")
+view(plot)
+```
