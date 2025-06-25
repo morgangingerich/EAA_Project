@@ -6,8 +6,20 @@ format: html
 ### Monday 6/23 afternoon, beginning mapping practice
 
 ```{r}
+library("tidyverse")
+library("readr")
+library("dataRetrieval")
+library("cowplot")
+library("googleway")
+library("ggrepel")
+library("ggspatial")
+library("sf")
 library("rnaturalearth")
 library("rnaturalearthdata")
+library("prismatic")
+```
+
+```{r}
 world<- ne_countries(scale = "medium",returnclass = "sf")
 ggplot(data = world)+
   geom_sf(aes(fill = pop_est))+
@@ -15,4 +27,67 @@ ggplot(data = world)+
   scale_fill_viridis_c(trans = "sqrt")+
   xlab("Longitude")+ylab("Latitude")+
   ggtitle("World Map")
+```
+
+```{r}
+world|>
+  ggplot()+
+  geom_sf()+
+  coord_sf(xlim = c(-102.15, -74.12), ylim = c(7.65,33.97),expand = FALSE)+
+  annotate(geom = "text", x = -90, y = 26, label = "Gulf of Mexico",
+           fontface = "italic", color = "grey30", size = 5)
+```
+
+```{r}
+world_points<- st_centroid(world)
+world_points <- cbind(world, st_coordinates(st_centroid(world$geometry)))
+
+ggplot(data = world) +
+geom_sf(fill = "antiquewhite") +
+geom_text(data= world_points,aes(x=X, y=Y, label=name),
+    color = "darkblue", fontface = "bold", size = 3, check_overlap = FALSE) +
+annotate(geom = "text", x = -90, y = 26, label = "Gulf of Mexico", 
+    fontface = "italic", color = "grey22", size = 5) +
+  annotation_scale(location="bl", width_hint = 0.5)+
+  annotation_north_arrow(location = "bl", which_north = "true", pad_x = unit(0.25, "in"), pad_y = unit(0.25, "in"), style = north_arrow_fancy_orienteering)+
+coord_sf(xlim = c(-102.15, -74.12), ylim = c(7.65, 33.97), expand = FALSE)+
+  xlab("Longitude")+ ylab("Latitude")+
+  ggtitle("Map of the Gulf of Mexico and the Carribbean Sea")+
+  theme(panel.grid.major = element_line(color = gray(.5), linetype = "dashed", size = 0.5), panel.background = element_rect(fill = "aliceblue"))
+```
+
+### Wednesday 6/25 more mapping practice
+
+```{r}
+#USGS Basins using ggplot
+#library("sf")
+shape <- read_sf("C:/Users/mgingerich/OneDrive - Edwards Aquifer Authority/Desktop/usgsrechargebasins/usgs_basins.shp")
+theme_set(theme_bw())
+ggplot()+
+  geom_sf(data = shape)+
+  labs(
+    title = "USGS Recharge Basins",
+    x = "Longitude",
+    y = "Latitude"
+  )
+```
+
+```{r}
+#USGS Basins using sf
+shape <- read_sf("C:/Users/mgingerich/OneDrive - Edwards Aquifer Authority/Desktop/usgsrechargebasins/usgs_basins.shp")
+plot(st_geometry(shape),col = sf.colors(9,categorical=TRUE),border = "grey22", axes = TRUE)
+plot(shape)
+shape
+```
+
+```{r}
+reservoirs <- read_sf("C:/Users/mgingerich/OneDrive - Edwards Aquifer Authority/Desktop/gis/reservoirs.shp")
+plot(reservoirs["SEG_NAME"])
+reservoirs
+```
+
+```{r}
+streams_recharge <- read_sf("C:/Users/mgingerich/OneDrive - Edwards Aquifer Authority/Desktop/gis/streams_recharge.shp")
+plot(streams_recharge["SEG_ID"])
+streams_recharge
 ```

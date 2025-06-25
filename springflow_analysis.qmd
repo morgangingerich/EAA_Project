@@ -120,5 +120,9 @@ select_streams<- streams|>
   semi_join(sucralose,
             by ="Date")|>
   arrange(Date)
-view(select_streams)#arranged in ascending order to facilitate joining with sucralose data. will need to remove comal new/old channels and determine which cfs measurement to use at each site (average?)
+view(select_streams)#arranged in ascending date order to facilitate joining with sucralose data. will need to remove comal new/old channels and determine which cfs measurement to use at each site (average?)
+```
+
+```{r}
+
 ```
