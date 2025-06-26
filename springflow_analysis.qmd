@@ -23,6 +23,7 @@ library("sf")
 library("rnaturalearth")
 library("rnaturalearthdata")
 library("prismatic")
+library("patchwork")
 ```
 
 ```{r}
@@ -73,6 +74,7 @@ gages<-as_tibble(df)|>
 #4 high flow days
 high_flow_days_300<-tibble(
   filter(gages, cfs>300))
+high_flow_days_300
 ```
 
 ```{r}
@@ -85,8 +87,32 @@ zero_flow_days<-tibble(
 #2 median monthly flow per gage
 by_gage_month <- gages|>
   group_by(gage_name,Month)|>
-  summarise(flow_mean = mean(cfs,na.rm=TRUE))
+  summarise(flow_mean = mean(cfs,na.rm=TRUE))|>
+  ungroup()
 by_gage_month
+
+p3 <- ggplot(by_gage_month)+geom_point(aes(Month,flow_mean, group = Month))+
+  facet_wrap(~gage_name)+
+  scale_x_continuous(breaks = seq(0,12,1),
+                   minor_breaks = seq(0,12,1))+
+  labs(
+    title = "Monthly Average Streamflow by Gage",
+    subtitle = "Comal and San Marcos Gages",
+    x = "Month",
+    y = "Mean Flow (cfs)"
+  )
+
+p4 <- ggplot(by_gage_month)+geom_point(aes(Month,flow_mean, group = Month, color = gage_name, shape = gage_name))+
+  labs(
+    title = "Monthly Average Streamflows by Gage",
+    subtitle = "Comal and San Marcos Gage Sites",
+    x = "Month",
+    y = "Mean Flow (cfs)"
+  )
+
+
+p4/
+  p3
 ```
 
 ```{r}
@@ -97,6 +123,19 @@ mean_flow_gage_year <- gages |>
   summarise(mean_flow = mean(cfs,na.rm=TRUE))|>
   ungroup()
 mean_flow_gage_year
+
+p5 <- ggplot(mean_flow_gage_year)+
+  geom_line(aes(Year,mean_flow, color = gage_name))+
+  labs(
+    title = "Annual Mean Flow by Gage",
+    x = "Year",
+    y = "Mean Flow (cfs)"
+  )+
+  facet_wrap(~gage_name)
+p5
+
+#find way to remove new/old channels and combine comal r+s and san marcos r+s
+#add geom_smooth to see if there are any interesting long term trends
 ```
 
 ```{r}
@@ -121,8 +160,4 @@ select_streams<- streams|>
             by ="Date")|>
   arrange(Date)
 view(select_streams)#arranged in ascending date order to facilitate joining with sucralose data. will need to remove comal new/old channels and determine which cfs measurement to use at each site (average?)
-```
-
-```{r}
-
 ```

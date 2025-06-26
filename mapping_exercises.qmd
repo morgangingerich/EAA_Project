@@ -61,22 +61,27 @@ coord_sf(xlim = c(-102.15, -74.12), ylim = c(7.65, 33.97), expand = FALSE)+
 ```{r}
 #USGS Basins using ggplot
 #library("sf")
+shape_points <- cbind(shape,st_coordinates(st_centroid(shape$geometry)))
+
 shape <- read_sf("C:/Users/mgingerich/OneDrive - Edwards Aquifer Authority/Desktop/usgsrechargebasins/usgs_basins.shp")
 theme_set(theme_bw())
-ggplot()+
-  geom_sf(data = shape)+
+ggplot(shape)+
+  geom_sf()+
   labs(
     title = "USGS Recharge Basins",
     x = "Longitude",
     y = "Latitude"
-  )
+  )+
+  geom_text(data = shape_points,aes(x=X,y=Y, label = Name_Desc),
+            color = "darkblue",fontface = "italic", size = 3, check_overlap = FALSE)+
+  annotation_scale(location = "bl",width_hint = 0.5)+
+  annotation_north_arrow(location = "bl", which_north = "true", pad_x = unit(0.25, "in"), pad_y = unit(0.25, "in"), style = north_arrow_fancy_orienteering)
 ```
 
 ```{r}
 #USGS Basins using sf
 shape <- read_sf("C:/Users/mgingerich/OneDrive - Edwards Aquifer Authority/Desktop/usgsrechargebasins/usgs_basins.shp")
 plot(st_geometry(shape),col = sf.colors(9,categorical=TRUE),border = "grey22", axes = TRUE)
-plot(shape)
 shape
 ```
 
