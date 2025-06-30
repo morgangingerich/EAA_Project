@@ -1,0 +1,171 @@
+---
+title: "Poster_Plots"
+format: html
+---
+
+```{r}
+library("tidyverse")
+library("readr")
+library("dataRetrieval")
+library("cowplot")
+library("googleway")
+library("ggrepel")
+library("ggspatial")
+library("sf")
+library("rnaturalearth")
+library("rnaturalearthdata")
+library("prismatic")
+library("patchwork")
+library("zoo")
+library("lubridate")
+library("reshape2")
+```
+
+### Spring flow Plots
+
+```{r}
+#avg <- gages|>
+#  group_by(gage_name)|>
+#  add_column(
+#    label = "avg")|>
+#  ungroup()
+
+#avg_25 <- gages|>
+#  group_by(gage_name)|>
+#  filter(year =="2025")|>
+#  add_column(
+#    label = "avg_25")|>
+#  ungroup()
+
+#avg_5yr <- gages|>
+#  group_by(gage_name,year)|>
+#  filter(year %in% c("2025","2024","2023","2022","2021","2020"))|>
+#  add_column(
+#    label = "avg_5yr")|>
+#  ungroup()
+
+avgs <- bind_rows(avg_25,avg_5yr,avg)|>
+  select(gage_name,cfs,label)
+
+avgs$label <- factor(avgs$label,
+                    levels = c("avg_25","avg_5yr","avg"))
+
+ggplot(avgs, aes(gage_name,cfs, color = label))+
+  geom_boxplot(aes(gage_name,cfs, color = label, fill = after_scale(clr_desaturate(clr_lighten(color,.8),.8))),linewidth = 0.65)+
+  stat_summary(fun=mean, geom = "point",shape = 4, position = position_dodge2(
+    width = 0.75, preserve = "single"))+
+  labs(
+    title = "Average Springflow over Time",
+    subtitle = "Comal Springs and San Marcos Springs",
+    y = "Springflow (cfs)",
+    x = "")+
+  scale_color_discrete(name = element_blank(),
+                       labels = c("2025","5-year","Long-term"))+
+  theme(legend.title = element_blank(),
+        legend.position = "top",
+        axis.title.y = element_text(margin = margin(r = 10)))
+  #ggsave("avg_springflow_over_time.png")
+```
+
+```{r}
+mean_flow_gage_year <- gages |>
+  group_by(gage_name,year)|>
+  summarise(mean_flow = mean(cfs,na.rm=TRUE))|>
+  ungroup()
+mean_flow_gage_year
+
+p5 <- ggplot(mean_flow_gage_year)+
+  geom_line(aes(year,mean_flow, color = gage_name))+
+  geom_smooth(aes(year,mean_flow),
+              color = "darkgrey",linetype = "dashed", se = FALSE)+
+  labs(
+    title = "Annual Mean Flow by Gage",
+    x = "Year",
+    y = "Mean Flow (cfs)"
+  )+
+  theme(legend.title = element_blank(),
+        legend.position = "none")+
+  facet_wrap(~gage_name)
+p5
+```
+
+```{r}
+
+```
+
+### Sucralose Plots
+
+```{r}
+plot1 <- stream_sucralose|>
+ggplot()+
+  geom_point(aes(avg_30_prior,result_value, color = gage_name), na.rm = TRUE)
+
+plot2 <- stream_sucralose|>
+  ggplot()+
+  geom_point(aes(avg_10_prior, result_value),na.rm = TRUE)
+
+plot3 <- stream_sucralose|>
+  ggplot()+
+  geom_point(aes(avg_60_prior, result_value), na.rm = TRUE)
+
+plot1 
+```
+
+```{r}
+theme_set(theme_bw())
+p1 <- stream_sucralose|>
+ggplot()+
+  geom_point(aes(Date,result_value, color = gage_name), na.rm = TRUE)+
+  geom_smooth(aes(Date,result_value))
+p1
+```
+
+```{r}
+
+```
+
+### Mapping plots
+
+```{r}
+shape_points <- cbind(shape,st_coordinates(st_centroid(shape$geometry)))
+
+shape <- read_sf("C:/Users/mgingerich/OneDrive - Edwards Aquifer Authority/Desktop/usgsrechargebasins/usgs_basins.shp")
+theme_set(theme_bw())
+ggplot(shape)+
+  geom_sf()+
+  labs(
+    title = "USGS Recharge Basins",
+    x = "Longitude",
+    y = "Latitude"
+  )+
+  geom_text(data = shape_points,aes(x=X,y=Y, label = Name_Desc),
+            color = "darkblue",fontface = "italic", size = 3, check_overlap = FALSE)+
+  annotation_scale(location = "bl",width_hint = 0.5,height=unit(0.15, "cm"))+
+  annotation_north_arrow(location = "bl", which_north = "true", pad_x = unit(0.25, "in"), pad_y = unit(0.25, "in"), style = north_arrow_fancy_orienteering)
+```
+
+```{r}
+zones <- read_sf("C:/Users/mgingerich/OneDrive - Edwards Aquifer Authority/Desktop/gis/boundary/boundary/AquiferZonesDissolvedClean1.shp")
+theme_set(theme_bw())
+ggplot(zones)+
+  geom_sf()+
+  labs(
+    title = "Contributing Zone within the Transition Zone",
+    x = "Longitude",
+    y = "Latitude")+
+  annotation_scale(location = "bl",width_hint = 0.5,height=unit(0.15, "cm"))+
+  annotation_north_arrow(location = "bl", which_north = "true", pad_x = unit(0.20, "in"), pad_y = unit(0.25, "in"), style = north_arrow_fancy_orienteering)
+
+recharge_streams<- read_sf("C:/Users/mgingerich/OneDrive - Edwards Aquifer Authority/Desktop/gis/streams_recharge.shp")
+ggplot(recharge_streams)
+  
+ggplot()+
+  geom_sf(data = zones)+
+  geom_sf(data = recharge_streams)+
+  ggtitle("Streams Within Contributing Zone")+
+  labs(
+    x = "Longitude",
+    y = "Latitude")+
+  annotation_scale(location = "bl",width_hint = 0.5,height=unit(0.15, "cm"))+
+  annotation_north_arrow(location = "bl", which_north = "true", pad_x = unit(0.20, "in"), pad_y = unit(0.25, "in"), style = north_arrow_fancy_orienteering)
+```

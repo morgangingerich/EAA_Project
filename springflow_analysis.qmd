@@ -9,7 +9,7 @@ The USGS operates over 500 streamgages in Texas alone– each measuring the amou
 
 Since springflow cannot be measured directly due to the complicating runoff factor, the USGS uses a computer program to interpolate springflow based on streamflow. This method assumes that springflow is relatively constant, only significantly changing with variable hydrologic conditions of the contributing regional aquifer (decreasing aquifer levels due to drought, for example, would cause a decrease in regional springflow). When surface water runoff from precipitation events contributes to streamflow, another computation is required to separate the streamflow measurement into its contributing parts: surface runoff and springflow. The computation essentially creates a smooth connection between springflow before and after the storm, when springflow and streamflow should be equal. All of these calculations are subject to a series of quality-control checks to ensure that the estimations are plausible and accurate given the coinciding hydrologic and weather conditions before publication.
 
-### dataRetrieval with NWIS data
+### Stream data set up
 
 ```{r}
 library("tidyverse")
@@ -24,122 +24,127 @@ library("rnaturalearth")
 library("rnaturalearthdata")
 library("prismatic")
 library("patchwork")
+library("zoo")
+library("lubridate")
 ```
 
 ```{r}
-#Steps 4-5, reading and combining all 6 gages into one tibble
-'smr'<-readNWISdv(siteNumbers = "08170500",
-               parameterCd = "00060")
-'sms'<-readNWISdv(siteNumbers = "08170000",
-               parameterCd = "00060")
-'cr'<-readNWISdv(siteNumbers = "08169000",
-                 parameterCd = "00060")
-'cs'<-readNWISdv(siteNumbers = "08168710",
-                 parameterCd = "00060")
-'crnc'<-readNWISdv(siteNumbers = "08168932",
-                 parameterCd = "00060")
-'croc'<-readNWISdv(siteNumbers = "08168913",
-                 parameterCd = "00060")
-df<-bind_rows(smr,sms,cr,cs,crnc,croc)|>
-  renameNWISColumns('df')
-df
-```
+#sms <-readNWISuv(siteNumbers = "08170000",
+#               parameterCd = "00060")
+#cs <-readNWISuv(siteNumbers = "08168710",
+#                 parameterCd = "00060")
+#df<-bind_rows(sms,cs)|>
+#  renameNWISColumns(df)
 
-```{r}
-#Steps 6-8, fixing column titles and adding new columns
-gages<-as_tibble(df)|>
-  select(site_no:Flow)|>
+gages<- df|>
   mutate(
-    Year = year(Date),
-    Month = month(Date),
-    Day = day(Date))|>
-  mutate(
-    gage_name = case_when(site_no=="08170500"~"San Marcos River",
+    gage_name = case_when(
               site_no=="08170000"~"San Marcos Springs",
-              site_no=="08169000"~"Comal River",
-              site_no=="08168710"~"Comal Springs",
-              site_no=="08168932"~"Comal New Channel",
-              site_no=="08168913"~"Comal Old Channel"
-              ))|>
-  relocate(gage_name,.before=Date)|>
-  rename(gage_number=site_no,
-         cfs=Flow)
+              site_no=="08168710"~"Comal Springs"),
+    dateTime = date(dateTime),
+    year = year(dateTime),
+    month = month(dateTime),
+    day = day(dateTime))|>
+  rename(
+    cfs = Flow_Inst,
+    Date = dateTime)|>
+  select(site_no,gage_name,Date,year,month,day,cfs)
 
-#write_csv(gages,"springflow_master.csv")
+#write_csv(gages,"springflow_master_2_gages.csv")
+```
+
+```{r}
+gages_2 <- gages|>
+  arrange(Date)|>
+  mutate(
+    avg_30_prior = rollmean(cfs,30,na.pad = TRUE, align = "right"),
+    avg_60_prior = rollmean(cfs,60,na.pad = TRUE, align = "right"),
+    avg_10_prior = rollmean(cfs,10,na.pad = TRUE, align = "right"))
+```
+
+```{r}
+stream_sucralose <- sucralose_no_dup_blank|>
+  left_join(gages_2, join_by(Date,gage_name))|>
+  select(Date,gage_name,cfs,avg_10_prior,avg_30_prior,avg_60_prior,result_value,lab_qualifiers)
+view(stream_sucralose)
 ```
 
 ### Analysis Tibbles
 
 ```{r}
-#4 high flow days
+#High flow days
 high_flow_days_300<-tibble(
   filter(gages, cfs>300))
 high_flow_days_300
 ```
 
 ```{r}
-#7 zero flow days by days by gage
+#Zero flow days by days by gage
 zero_flow_days<-tibble(
   filter(gages, cfs==0))
 ```
 
 ```{r}
-#2 median monthly flow per gage
+#Median monthly flow by gage
 by_gage_month <- gages|>
-  group_by(gage_name,Month)|>
+  group_by(gage_name,month)|>
   summarise(flow_mean = mean(cfs,na.rm=TRUE))|>
   ungroup()
 by_gage_month
 
-p3 <- ggplot(by_gage_month)+geom_point(aes(Month,flow_mean, group = Month))+
+p3 <- ggplot(by_gage_month)+geom_point(aes(month,flow_mean, group = month, color = gage_name, shape = gage_name))+
   facet_wrap(~gage_name)+
   scale_x_continuous(breaks = seq(0,12,1),
                    minor_breaks = seq(0,12,1))+
   labs(
-    title = "Monthly Average Streamflow by Gage",
-    subtitle = "Comal and San Marcos Gages",
-    x = "Month",
-    y = "Mean Flow (cfs)"
-  )
-
-p4 <- ggplot(by_gage_month)+geom_point(aes(Month,flow_mean, group = Month, color = gage_name, shape = gage_name))+
-  labs(
     title = "Monthly Average Streamflows by Gage",
     subtitle = "Comal and San Marcos Gage Sites",
+    y = "Mean Flow (cfs)"
+  )+
+  theme(legend.position = "none")+
+  theme(axis.title.x = element_blank())
+
+p4 <- ggplot(by_gage_month)+
+  geom_point(aes(month,flow_mean, group = month, color = gage_name, shape = gage_name))+
+  labs(
     x = "Month",
     y = "Mean Flow (cfs)"
-  )
+  )+
+  theme(legend.position = "none")+
+  scale_x_continuous(breaks = seq(0,12,1),
+                   minor_breaks = seq(0,12,1))
 
 
-p4/
-  p3
+p3/
+  p4
+#ggsave("monthly_avg_springflows_by_gage.png")
 ```
 
 ```{r}
-#mean flow by gage and year
 mean_flow_gage_year <- gages |>
-#could add something in here to exclude comal new/old channels
-  group_by(gage_name,Year)|>
+  group_by(gage_name,year)|>
   summarise(mean_flow = mean(cfs,na.rm=TRUE))|>
   ungroup()
 mean_flow_gage_year
 
 p5 <- ggplot(mean_flow_gage_year)+
-  geom_line(aes(Year,mean_flow, color = gage_name))+
+  geom_line(aes(year,mean_flow, color = gage_name))+
+  geom_smooth(aes(year,mean_flow),
+              color = "darkgrey",linetype = "dashed", se = FALSE)+
   labs(
     title = "Annual Mean Flow by Gage",
     x = "Year",
     y = "Mean Flow (cfs)"
   )+
+  theme(legend.title = element_blank(),
+        legend.position = "none")+
   facet_wrap(~gage_name)
 p5
-
-#find way to remove new/old channels and combine comal r+s and san marcos r+s
-#add geom_smooth to see if there are any interesting long term trends
+#ggsave("annual_mean_flow_by_gage.png")
 ```
 
 ```{r}
-#5, highest median flow by month_day
+#Highest median flow by month_day
 peak_monthday_flows <-gages|>
   group_by(gage_name,Month,Day)|>
   summarise(median_flow = median(cfs,na.rm=TRUE))|>
@@ -149,15 +154,4 @@ peak_monthday_flows <-gages|>
   slice(1:1)|>
   ungroup()
 peak_monthday_flows
-```
-
-```{r}
-sucralose <- readr::read_csv("sucralose_simplified.csv", col_types = cols(
-  Date = col_date("%m.%d.%Y")))
-streams <- gages
-select_streams<- streams|>
-  semi_join(sucralose,
-            by ="Date")|>
-  arrange(Date)
-view(select_streams)#arranged in ascending date order to facilitate joining with sucralose data. will need to remove comal new/old channels and determine which cfs measurement to use at each site (average?)
 ```

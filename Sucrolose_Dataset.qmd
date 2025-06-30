@@ -22,19 +22,26 @@ library("prismatic")
 #library("tidyverse")
 #library("readr")
 #library("dataRetrieval")
-(sucralose <- readr::read_csv("sucralose_simplified.csv", col_types = cols(
+(sucralose_raw <- readr::read_csv("sucralose_simplified.csv", col_types = cols(
   Date = col_date("%m.%d.%Y"),
 )))
 ```
 
 ```{r}
-theme_set(theme_bw())
-sucralose|>
-  mutate(add_column(sucralose,
+sucralose <- sucralose_raw|>
+  mutate(add_column(sucralose_raw,
     gage_name = case_when(
-      str_detect(sys_sample_code, "CM") ~ "comal_spring_run_3",
-      str_detect(sys_sample_code, "SM") ~ "san_marcos_hotel")))|>
-  relocate("gage_name",.before="date")|>
+      str_detect(sys_sample_code, "CM") ~ "Comal Springs",
+      str_detect(sys_sample_code, "SM") ~ "San Marcos Springs")))|>
+  relocate("gage_name",.before="Date")
+
+sucralose_no_dup <- subset(sucralose,duplicate == "N")
+sucralose_no_dup_blank <- subset(sucralose, blank == "N")
+```
+
+```{r}
+theme_set(theme_bw())
+sucralose_plot <- sucralose|>
   group_by(gage_name,month)|>
   summarize(sucralose_mean = mean(result_value, na.rm=TRUE))|>
   ungroup()|>
@@ -42,7 +49,7 @@ sucralose|>
   geom_point()+
   scale_x_continuous(breaks=c(1,2,3,4,5,6,7,8,9,10,11,12))+
   labs(
-    title = "Sucralose by gage and month",
+    title = "Sucralose by Gage and Month",
     subtitle = "Comal and San Marcos Rivers",
     x = "Month", y = "Average Sucralose (ng/L)")+
   theme(axis.title.x = element_text(margin = margin(t=5)),
@@ -50,14 +57,5 @@ sucralose|>
   scale_color_discrete(
     name = "Gage",
     labels = c("Comal River Spring Run 3", "San Marcos Springs Hotel Site"))
-```
-
-```{r}
-plot<- sucralose|>
-  mutate(add_column(sucralose,
-    gage_name = case_when(
-      str_detect(sys_sample_code, "CM") ~ "comal_spring_run_3",
-      str_detect(sys_sample_code, "SM") ~ "san_marcos_hotel")))|>
-  relocate("gage_name",.before="Date")
-view(plot)
+sucralose_plot
 ```
