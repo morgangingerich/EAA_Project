@@ -6,6 +6,21 @@ format: html
 ### Monday 6/23 Penguin Data Plotting Exercises
 
 ```{r}
+#library("tidyverse")
+#library("ggplot2")
+#library("dataRetrieval")
+#library("readr")
+#library("cowplot")
+#library("googleway")
+#library("ggrepel")
+#library("ggspatial")
+#library("sf")
+#library("rnaturalearth")
+#library("rnaturalearthdata")
+#library("prismatic")
+```
+
+```{r}
 ggplot(data = penguins,
        mapping = aes(x= flipper_len, y = body_mass)
        )+

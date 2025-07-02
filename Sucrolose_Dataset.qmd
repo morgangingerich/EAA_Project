@@ -19,9 +19,6 @@ library("prismatic")
 ```
 
 ```{r}
-#library("tidyverse")
-#library("readr")
-#library("dataRetrieval")
 (sucralose_raw <- readr::read_csv("sucralose_simplified.csv", col_types = cols(
   Date = col_date("%m.%d.%Y"),
 )))
@@ -58,4 +55,29 @@ sucralose_plot <- sucralose|>
     name = "Gage",
     labels = c("Comal River Spring Run 3", "San Marcos Springs Hotel Site"))
 sucralose_plot
+```
+
+### Analyzing quality of sucralose data
+
+```{r}
+suc_detected <- sucralose|>
+  filter(detect_flag == "Y")
+
+false_pos <- suc_detected|>
+  filter(blank == "Y")
+```
+
+```{r}
+duplicates <- sucralose|>
+  filter(gage_name %in% c("San Marcos Springs","Comal Springs"),
+         duplicate == "Y" | lead(duplicate) == "Y")|>
+  mutate(label = case_when(
+    str_detect(duplicate, "N")~"Original",
+    str_detect(duplicate, "Y")~"Duplicate"
+  ))
+
+dup_plot <- duplicates|>
+  ggplot()+
+  geom_point(aes(x = Date, y = result_value, color = label))
+dup_plot
 ```

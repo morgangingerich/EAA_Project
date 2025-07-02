@@ -19,36 +19,44 @@ library("patchwork")
 library("zoo")
 library("lubridate")
 library("reshape2")
+theme_set(theme_bw())
 ```
 
 ### Spring flow Plots
 
 ```{r}
-#avg <- gages|>
-#  group_by(gage_name)|>
-#  add_column(
-#    label = "avg")|>
-#  ungroup()
+avg <- gages|>
+  group_by(gage_name)|>
+  add_column(
+    label = "avg")|>
+    ungroup()
 
-#avg_25 <- gages|>
-#  group_by(gage_name)|>
-#  filter(year =="2025")|>
-#  add_column(
-#    label = "avg_25")|>
-#  ungroup()
+avg_25 <- gages|>
+  group_by(gage_name)|>
+  filter(year =="2025")|>
+  add_column(
+    label = "avg_25")|>
+  ungroup()
 
-#avg_5yr <- gages|>
-#  group_by(gage_name,year)|>
-#  filter(year %in% c("2025","2024","2023","2022","2021","2020"))|>
-#  add_column(
-#    label = "avg_5yr")|>
-#  ungroup()
+avg_5yr <- gages|>
+  group_by(gage_name,year)|>
+  filter(year %in% c("2025","2024","2023","2022","2021","2020"))|>
+  add_column(
+    label = "avg_5yr")|>
+  ungroup()
 
-avgs <- bind_rows(avg_25,avg_5yr,avg)|>
+avg_24 <- gages|>
+  group_by(gage_name, year)|>
+  filter(year == "2024")|>
+  add_column(
+    label = "avg_24")|>
+  ungroup()
+
+avgs <- bind_rows(avg_24,avg_25,avg_5yr,avg)|>
   select(gage_name,cfs,label)
 
 avgs$label <- factor(avgs$label,
-                    levels = c("avg_25","avg_5yr","avg"))
+                    levels = c("avg_24","avg_25","avg_5yr","avg"))
 
 ggplot(avgs, aes(gage_name,cfs, color = label))+
   geom_boxplot(aes(gage_name,cfs, color = label, fill = after_scale(clr_desaturate(clr_lighten(color,.8),.8))),linewidth = 0.65)+
@@ -60,11 +68,11 @@ ggplot(avgs, aes(gage_name,cfs, color = label))+
     y = "Springflow (cfs)",
     x = "")+
   scale_color_discrete(name = element_blank(),
-                       labels = c("2025","5-year","Long-term"))+
+                       labels = c("2024","2025","5-year","Long-term"))+
   theme(legend.title = element_blank(),
         legend.position = "top",
         axis.title.y = element_text(margin = margin(r = 10)))
-  #ggsave("avg_springflow_over_time.png")
+  ggsave("avg_springflow_over_time.png")
 ```
 
 ```{r}
@@ -90,28 +98,99 @@ p5
 ```
 
 ```{r}
+by_gage_month <- gages|>
+  group_by(gage_name,month)|>
+  summarise(flow_mean = mean(cfs,na.rm=TRUE))|>
+  ungroup()
+by_gage_month
 
+p3 <- ggplot(by_gage_month)+geom_point(aes(month,flow_mean, group = month, color = gage_name, shape = gage_name))+
+  facet_wrap(~gage_name)+
+  scale_x_continuous(breaks = seq(0,12,1),
+                   minor_breaks = seq(0,12,1))+
+  labs(
+    title = "Monthly Average Streamflows by Gage",
+    subtitle = "Comal and San Marcos Gage Sites",
+    y = "Mean Flow (cfs)"
+  )+
+  theme(legend.position = "none")+
+  theme(axis.title.x = element_blank())
+
+p4 <- ggplot(by_gage_month)+
+  geom_point(aes(month,flow_mean, group = month, color = gage_name, shape = gage_name))+
+  labs(
+    x = "Month",
+    y = "Mean Flow (cfs)"
+  )+
+  theme(legend.position = "none")+
+  scale_x_continuous(breaks = seq(0,12,1),
+                   minor_breaks = seq(0,12,1))
+
+
+p3/
+  p4
+```
+
+```{r}
+#dashed lines show flow goals
+cfs_plot_cs <- streams|>
+  filter(gage_name =="Comal Springs")|>
+  ggplot()+
+  geom_line(aes(x = Date, y = cfs), color = "salmon", lwd = 1)+
+  facet_wrap(~gage_name)+
+  theme(legend.position = "none",
+        axis.title.x = element_blank())
+
+cfs_plot_sms <- streams|>
+  filter(gage_name =="San Marcos Springs")|>
+  ggplot()+
+  geom_line(aes(x = Date, y = cfs), color = "turquoise", lwd = 1)+
+  facet_wrap(~gage_name)+
+  theme(legend.position = "none",
+        axis.title.x = element_blank())
+
+cfs_plot_cs + geom_hline(yintercept = c(225,30), linetype = "dashed", color = c("springgreen3","red"))+
+cfs_plot_sms + geom_hline(yintercept = c(140,80), linetype = "dashed", color = c("springgreen3", 'red'))+ plot_annotation('Daily Flow by Gage', caption = 'Source: USGS',theme=theme(plot.title=element_text(hjust=0.5)))
 ```
 
 ### Sucralose Plots
 
 ```{r}
+plot <- stream_sucralose|>
+  ggplot()+
+  geom_boxplot(aes(gage_name,result_value, color = gage_name, 
+                   fill = after_scale(clr_desaturate(
+                     clr_lighten(color,.8),.8))),linewidth = 0.65)+
+  labs(
+    title = "Sucralose Levels by Gage",
+    x = "Gage",
+    y = "Sucralose (ug/L)"
+  )+
+  theme(legend.position = "none")
+plot
+```
+
+```{r}
+#Either will not be used for poster or will be designed better
 plot1 <- stream_sucralose|>
 ggplot()+
   geom_point(aes(avg_30_prior,result_value, color = gage_name), na.rm = TRUE)
 
 plot2 <- stream_sucralose|>
   ggplot()+
-  geom_point(aes(avg_10_prior, result_value),na.rm = TRUE)
+  geom_point(aes(avg_10_prior, result_value, color = gage_name),na.rm = TRUE)
 
 plot3 <- stream_sucralose|>
   ggplot()+
-  geom_point(aes(avg_60_prior, result_value), na.rm = TRUE)
+  geom_point(aes(avg_60_prior, result_value, color = gage_name), na.rm = TRUE)
 
 plot1 
+plot2
+plot3
 ```
 
 ```{r}
+#Either will not be used for poster or will be designed better
 theme_set(theme_bw())
 p1 <- stream_sucralose|>
 ggplot()+
@@ -158,14 +237,24 @@ ggplot(zones)+
 
 recharge_streams<- read_sf("C:/Users/mgingerich/OneDrive - Edwards Aquifer Authority/Desktop/gis/streams_recharge.shp")
 ggplot(recharge_streams)
+
+gages_csv <- read.csv("C:/Users/mgingerich/Downloads/gage_coords(Sheet1).csv")
+  gage_points <- st_as_sf(gages_csv, coords = c("Longitude","Latitude"),
+                          crs = 4269)
   
 ggplot()+
   geom_sf(data = zones)+
   geom_sf(data = recharge_streams)+
+  geom_sf(data = gage_coords,
+          mapping = aes(geometry = geometry),
+          size = 3,
+          color = "red")+
   ggtitle("Streams Within Contributing Zone")+
   labs(
     x = "Longitude",
     y = "Latitude")+
   annotation_scale(location = "bl",width_hint = 0.5,height=unit(0.15, "cm"))+
   annotation_north_arrow(location = "bl", which_north = "true", pad_x = unit(0.20, "in"), pad_y = unit(0.25, "in"), style = north_arrow_fancy_orienteering)
+
+#I would like to add labels to the dots that mark comal and san marcos spring gage location, but i can't figure out how
 ```

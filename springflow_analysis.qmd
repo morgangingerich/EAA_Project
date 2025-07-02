@@ -146,7 +146,7 @@ p5
 ```{r}
 #Highest median flow by month_day
 peak_monthday_flows <-gages|>
-  group_by(gage_name,Month,Day)|>
+  group_by(gage_name,month,day)|>
   summarise(median_flow = median(cfs,na.rm=TRUE))|>
   ungroup()|>
   group_by(gage_name)|>
@@ -154,4 +154,26 @@ peak_monthday_flows <-gages|>
   slice(1:1)|>
   ungroup()
 peak_monthday_flows
+```
+
+```{r}
+#dashed lines show flow goals
+cfs_plot_cs <- streams|>
+  filter(gage_name =="Comal Springs")|>
+  ggplot()+
+  geom_line(aes(x = Date, y = cfs), color = "salmon", lwd = 1)+
+  facet_wrap(~gage_name)+
+  theme(legend.position = "none",
+        axis.title.x = element_blank())+
+
+cfs_plot_sms <- streams|>
+  filter(gage_name =="San Marcos Springs")|>
+  ggplot()+
+  geom_line(aes(x = Date, y = cfs), color = "turquoise", lwd = 1)+
+  facet_wrap(~gage_name)+
+  theme(legend.position = "none",
+        axis.title.x = element_blank())
+
+cfs_plot_cs + geom_hline(yintercept = c(225,30), linetype = "dashed", color = c("springgreen3","red"))+
+cfs_plot_sms + geom_hline(yintercept = c(140,80), linetype = "dashed", color = c("springgreen3", 'red'))+ plot_annotation('Daily Flow by Gage', caption = 'Source: USGS',theme=theme(plot.title=element_text(hjust=0.5)))
 ```
