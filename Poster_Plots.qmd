@@ -264,6 +264,22 @@ dup_plot <- duplicates|>
 dup_plot
 ```
 
+```{r}
+blanks_plot <- false_pos|>
+  ggplot()+
+  geom_point(aes(sys_sample_code,result_value, 
+                 color = gage_name, shape = gage_name), size = 3)+
+  geom_point(aes(sys_sample_code,reporting_detection_limit), shape = 4)+
+  labs(
+    title = "Analysis of DI Blank Measurements",
+    x = "Date",
+    y = "Sucralose (ng/L)",
+    caption = "*cross represents the reporting detection limit")+
+  theme(legend.title = element_blank())+
+  theme(legend.position = "bottom")
+blanks_plot
+```
+
 ### Mapping plots
 
 ```{r}

@@ -1,0 +1,24 @@
+---
+title: "Sucralose_as_tracer"
+format: html
+---
+
+## Sucralose as a tracer 
+
+### References:
+
+Douglas B. Mawhinney, Robert B. Young, Brett J. Vanderford, Thomas Borch, and Shane A. Snyder Environmental Science & Technology 2011 45 (20), 8716-8722, <https://pubs.acs.org/doi/10.1021/es202404c>
+
+Joan Oppenheimer, Andrew Eaton, Mohammad Badruzzaman, Ali W. Haghani, Joseph G. Jacangelo, Occurrence and suitability of sucralose as an indicator compound of wastewater loading to surface waters in urbanized regions, Water Research, Volume 45, Issue 13, 2011, Pages 4019-4027, ISSN 0043-1354, <https://doi.org/10.1016/j.watres.2011.05.014.> (<https://www.sciencedirect.com/science/article/pii/S0043135411002776)>
+
+Kathryn L. Linge, Yolanta Gruchlik, Francesco Busetti, Una Ryan, Cynthia A. Joll, Use of micropollutant indicator ratios to characterize wastewater treatment plant efficiency and to identify wastewater impact on groundwater, Journal of Environmental Management, Volume 358, 2024, 120822, ISSN 0301-4797, <https://doi.org/10.1016/j.jenvman.2024.120822.> (<https://www.sciencedirect.com/science/article/pii/S0301479724008089)>
+
+Laura A. Richards, Rupa Kumari, Debbie White, Neha Parashar, Arun Kumar, Ashok Ghosh, Sumant Kumar, Biswajit Chakravorty, Chuanhe Lu, Wayne Civil, Dan J. Lapworth, Stefan Krause, David A. Polya, Daren C. Gooddy, Emerging organic contaminants in groundwater under a rapidly developing city (Patna) in northern India dominated by high concentrations of lifestyle chemicals, Environmental Pollution, Volume 268, Part A, 2021, 115765, ISSN 0269-7491, <https://doi.org/10.1016/j.envpol.2020.115765.> (<https://www.sciencedirect.com/science/article/pii/S026974912036454X)>
+
+L.W. Herren, R.A. Brewton, L.E. Wilking, M.E. Tarnowski, M.A. Vogel, B.E. Lapointe, Septic systems drive nutrient enrichment of groundwaters and eutrophication in the urbanized Indian River Lagoon, Florida, Marine Pollution Bulletin, Volume 172, 2021, 112928, ISSN 0025-326X, <https://doi.org/10.1016/j.marpolbul.2021.112928.> (<https://www.sciencedirect.com/science/article/pii/S0025326X21009620)>
+
+W.D. Robertson, D.R. Van Stempvoort, J. Spoelstra, S.J. Brown, S.L. Schiff, Degradation of sucralose in groundwater and implications for age dating contaminated groundwater, Water Research, Volume 88, 2016, Pages 653-660, ISSN 0043-1354, <https://doi.org/10.1016/j.watres.2015.10.051.> (<https://www.sciencedirect.com/science/article/pii/S0043135415303158)>
+
+### Notes:
+
+Many compounds can be used to trace sources of wastewater pollution within ground and surface water systems. Sucralose, an artificial sweetener comprised of chlorinated sucrose, is widely used as a food additive in the modern world. However, sucralose is not effectively absorbed and metabolized by the body and is therefore mostly excreted without change. Furthermore, sucralose is environmentally persistent and does not readily degrade through wastewater treatment nor natural processes. These factors make sucralose a particularly effective groundwater tracer– high levels of sucralose detected in groundwater can indicate contamination with wastewater.
