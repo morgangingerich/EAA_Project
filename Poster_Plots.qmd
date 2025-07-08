@@ -177,7 +177,7 @@ ggplot()+
   theme(legend.position = "none",)+
   labs(
     x = "30-day Prior Avg Flow (cfs)",
-    y = "Sucralose (ng/L)")
+    y = "Sucralose (ug/L)")
 
 plot2 <- stream_sucralose|>
   ggplot()+
@@ -187,7 +187,7 @@ plot2 <- stream_sucralose|>
   title = "Sucralose Levels by Flow",
     subtitle = "Comal and San Marcos Springs",
   x = "10-day Prior Avg Flow (cfs)",
-  y = "Sucralose (ng/L)")
+  y = "Sucralose (ug/L)")
 
 plot3 <- stream_sucralose|>
   ggplot()+
@@ -197,7 +197,7 @@ plot3 <- stream_sucralose|>
         legend.title = element_blank())+
   labs(
     x = "60-day Prior Avg Flow (cfs)",
-    y = "Sucralose (ng/L)")
+    y = "Sucralose (ug/L)")
 
 plot4 <- stream_sucralose|>
   ggplot()+
@@ -205,7 +205,7 @@ plot4 <- stream_sucralose|>
   theme(legend.position = "none")+
   labs(
     x = "Day-of Flow (cfs)",
-    y = "Sucralose (ng/L)")
+    y = "Sucralose (ug/L)")
 
 plot2+plot1+plot3+plot4
 ```
@@ -216,12 +216,13 @@ ggplot()+
   geom_point(aes(Date,result_value, color = gage_name), na.rm = TRUE)+
   geom_smooth(aes(Date,result_value, color = gage_name),se=FALSE)+
   theme(legend.position = "bottom",
-        legend.title = element_blank())+
+        legend.title = element_blank(),
+        legend.margin = margin(l=220))+
   labs(
     title = "Sucralose Levels by Gage and Date",
     subtitle = "Comal and San Marcos Springs",
     x = "",
-    y = "Sucralose (ng/L)")
+    y = "Sucralose (ug/L)")
 
 p2 <- stream_sucralose|>
   ggplot()+
