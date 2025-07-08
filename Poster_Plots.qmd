@@ -164,8 +164,7 @@ plot <- stream_sucralose|>
   labs(
     title = "Sucralose Levels by Gage",
     x = "Gage",
-    y = "Sucralose (ug/L)"
-  )+
+    y = "Sucralose (ng/L)")+
   theme(legend.position = "none")
 plot
 ```
@@ -177,7 +176,7 @@ ggplot()+
   theme(legend.position = "none",)+
   labs(
     x = "30-day Prior Avg Flow (cfs)",
-    y = "Sucralose (ug/L)")
+    y = "Sucralose (ng/L)")
 
 plot2 <- stream_sucralose|>
   ggplot()+
@@ -187,7 +186,7 @@ plot2 <- stream_sucralose|>
   title = "Sucralose Levels by Flow",
     subtitle = "Comal and San Marcos Springs",
   x = "10-day Prior Avg Flow (cfs)",
-  y = "Sucralose (ug/L)")
+  y = "Sucralose (ng/L)")
 
 plot3 <- stream_sucralose|>
   ggplot()+
@@ -197,7 +196,7 @@ plot3 <- stream_sucralose|>
         legend.title = element_blank())+
   labs(
     x = "60-day Prior Avg Flow (cfs)",
-    y = "Sucralose (ug/L)")
+    y = "Sucralose (ng/L)")
 
 plot4 <- stream_sucralose|>
   ggplot()+
@@ -205,7 +204,7 @@ plot4 <- stream_sucralose|>
   theme(legend.position = "none")+
   labs(
     x = "Day-of Flow (cfs)",
-    y = "Sucralose (ug/L)")
+    y = "Sucralose (ng/L)")
 
 plot2+plot1+plot3+plot4
 ```
@@ -222,7 +221,7 @@ ggplot()+
     title = "Sucralose Levels by Gage and Date",
     subtitle = "Comal and San Marcos Springs",
     x = "",
-    y = "Sucralose (ug/L)")
+    y = "Sucralose (ng/L)")
 
 p2 <- stream_sucralose|>
   ggplot()+
@@ -230,7 +229,7 @@ p2 <- stream_sucralose|>
                    fill = after_scale(clr_desaturate(
                      clr_lighten(color,.8),.8))),linewidth = 0.65)+
   labs(x = "",
-    y = "Sucralose (ug/L)")+
+    y = "Sucralose (ng/L)")+
   theme(legend.position = "none")
 
 p1+p2
