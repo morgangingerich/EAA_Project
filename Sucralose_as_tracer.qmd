@@ -3,7 +3,7 @@ title: "Sucralose_as_tracer"
 format: html
 ---
 
-## Sucralose as a tracer 
+## Sucralose as a tracer
 
 ### References:
 
@@ -21,4 +21,23 @@ W.D. Robertson, D.R. Van Stempvoort, J. Spoelstra, S.J. Brown, S.L. Schiff, Degr
 
 ### Notes:
 
-Many compounds can be used to trace sources of wastewater pollution within ground and surface water systems. Sucralose, an artificial sweetener comprised of chlorinated sucrose, is widely used as a food additive in the modern world. However, sucralose is not effectively absorbed and metabolized by the body and is therefore mostly excreted without change. Furthermore, sucralose is environmentally persistent and does not readily degrade through wastewater treatment nor natural processes. These factors make sucralose a particularly effective groundwater tracer– high levels of sucralose detected in groundwater can indicate contamination with wastewater.
+Sucralose, an artificial sweetener comprised of chlorinated sucrose, is widely used as a food additive in the modern world. However, sucralose is not effectively absorbed and metabolized by the body and is therefore mostly excreted without change. Furthermore, sucralose is environmentally persistent and does not readily degrade through wastewater treatment nor natural processes. These factors make sucralose a particularly effective groundwater tracer; high levels of sucralose detected in groundwater can indicate wastewater contamination.
+
+"For example, if a well sample showed evidence of wastewater because of the presence of artificial sweeteners, if the ratio of SUC/ACE was found to be similar to current wastewaters, then the contaminant source may only be a few years old. If the ratio was lower or if SUC was absent, this could indicate older impact originating prior to 2000 in the US or 2003 in the EU, and consequently such a well might be considered less at risk from wastewater-derived contaminants such as pathogens.” - Robertson
+
+"The findings statistically demonstrate the superior performance of sucralose as a potential indicator of domestic wastewater input in the [U.S.](https://www.sciencedirect.com/topics/earth-and-planetary-sciences/united-states-of-america) While several compounds were detected in all of the wastewater effluent samples, only sucralose was consistently detected in the source waters with known wastewater discharges, absent in the sources without wastewater influence, and consistently present in septic samples. All of the other compounds were prone to either false negatives or false positives in the environment.” - Oppenheimer
+
+**How do sucralose levels in the Edwards compare to around the world?**
+
+-Europe has lower average sucralose levels in groundwater (1-10ug/L in wastewater)
+
+-other studies in America show similar levels of suc in groundwater, though there is a large range depending on whether or not the water is near any sources of wastewater
+
+-Robertson's average in the study was 27ug/L in wastewater and 1-10ug/L in groundwater
+
+-Our measurements of the comal and san marcos have median values of around 10ug/L (Comal) and around 13ug/L (San Marcos)
+
+**Are there any environmental or human regulatory thresholds for sucralose?**\
+-No, sucralose has been deemed not harmful to the environment/wildlife nor humans and therefore there are no restrictions/thresholds in the US.
+
+"SUC does not alter survival, growth, and reproduction of diverse organisms such as plants, algae, crustaceans, and fish..." - Baena-Nogueras
